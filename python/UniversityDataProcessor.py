@@ -14,7 +14,7 @@ def create_university_tables(db_name):
     cursor.execute('''
             CREATE TABLE IF NOT EXISTS university_info (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                maximum_daily_temperature TEXT,
+                `name` TEXT UNIQUE,
                 state_province TEXT,
                 alpha_two_code TEXT,
                 country TEXT
@@ -25,7 +25,7 @@ def create_university_tables(db_name):
              CREATE TABLE IF NOT EXISTS web_pages (
                  web_page_id INTEGER PRIMARY KEY AUTOINCREMENT,
                  university_id INTEGER,
-                 web_page TEXT,
+                 web_page TEXT UNIQUE,
                  FOREIGN KEY (university_id) REFERENCES universities(id)
              )
          ''')
@@ -34,7 +34,7 @@ def create_university_tables(db_name):
                  CREATE TABLE IF NOT EXISTS domains (
                      domain_id INTEGER PRIMARY KEY AUTOINCREMENT,
                      university_id INTEGER,
-                     domain_name TEXT,
+                     domain_name TEXT UNIQUE,
                      FOREIGN KEY (university_id) REFERENCES universities(id)
                  )
              ''')
@@ -79,7 +79,7 @@ def insert_universities_info(conn, university_info_df):
     # Insert university_info DataFrame into the university_info table
     for index, row in university_info_df.iterrows():
         cursor.execute('''
-            INSERT INTO university_info (name, state_province, alpha_two_code, country)
+            INSERT OR IGNORE INTO university_info (name, state_province, alpha_two_code, country)
             VALUES (?, ?, ?, ?)
         ''', (row['name'], row['state-province'], row['alpha_two_code'], row['country']))
 
@@ -89,14 +89,14 @@ def insert_universities_info(conn, university_info_df):
         # Insert the web pages
         for web_page in row['web_pages']:
             cursor.execute('''
-                INSERT INTO web_pages (university_id, web_page)
+                INSERT OR IGNORE INTO web_pages (university_id, web_page)
                 VALUES (?, ?)
             ''', (university_id, web_page))
 
         # Insert the domains
         for domain in row['domains']:
             cursor.execute('''
-                INSERT INTO domains (university_id, domain_name)
+                INSERT OR IGNORE INTO domains (university_id, domain_name)
                 VALUES (?, ?)
             ''', (university_id, domain))
 
