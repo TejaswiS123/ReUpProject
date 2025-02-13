@@ -9,9 +9,9 @@ def create_university_tables(db_name):
     #universities, web_pages and domains if they dont exist
     #using 3NF normalized form for designing schema
 
-    connection = sqlite3.connect(db_name)
-    cursor = connection.cursor()
-    cursor.execute('''
+        connection = sqlite3.connect(db_name)
+        cursor = connection.cursor()
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS university_info (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 `name` TEXT UNIQUE,
@@ -21,7 +21,7 @@ def create_university_tables(db_name):
             )
         ''')
 
-    cursor.execute('''
+        cursor.execute('''
              CREATE TABLE IF NOT EXISTS web_pages (
                  web_page_id INTEGER PRIMARY KEY AUTOINCREMENT,
                  university_id INTEGER,
@@ -30,7 +30,7 @@ def create_university_tables(db_name):
              )
          ''')
 
-    cursor.execute('''
+        cursor.execute('''
                  CREATE TABLE IF NOT EXISTS domains (
                      domain_id INTEGER PRIMARY KEY AUTOINCREMENT,
                      university_id INTEGER,
@@ -39,8 +39,8 @@ def create_university_tables(db_name):
                  )
              ''')
 
-    connection.commit()
-    return connection
+        connection.commit()
+        return connection
 
 def fetch_universities_data_partial(url):
     http = urllib3.PoolManager()
@@ -106,13 +106,17 @@ def insert_universities_info(conn, university_info_df):
 def main():
     print("Setting up the database...")
     print("Creating universities table...")
-    conn = create_university_tables("reup.db")
-    print("Fetching universities data...")
-    data_frame = fetch_universities_data("http://universities.hipolabs.com/search?country=China")
-    print("Inserting universities data...")
-    insert_universities_info(conn, data_frame)
-    conn.close()
-    print("Done!")
+    try:
+        conn = create_university_tables("reup.db")
+        print("Fetching universities data...")
+        data_frame = fetch_universities_data("http://universities.hipolabs.com/search?country=China")
+        print("Inserting universities data...")
+        insert_universities_info(conn, data_frame)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    finally:
+        conn.close()
+        print("Done!")
 
 if __name__ == "__main__":
     main()
