@@ -12,7 +12,7 @@ def create_university_tables(db_name):
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
     cursor.execute('''
-            CREATE TABLE IF NOT EXISTS daily_weather (
+            CREATE TABLE IF NOT EXISTS university_info (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 maximum_daily_temperature TEXT,
                 state_province TEXT,
